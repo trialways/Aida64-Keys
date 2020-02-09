@@ -156,6 +156,7 @@ fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
     }
 }
 
+// example method for generating a key
 fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expire1_val: i32, expire2_val: i32) -> String {
     let mut rng = thread_rng();
     let unk1 = rng.gen_range(100, 989);
@@ -183,10 +184,13 @@ fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expi
 }
 
 fn main() {
+    let license_count = 1;
+    let purchase_date = Date {day: 1, month: 2, year: 2020}.enc();
+    let license_expire = 0;
+    let maintance_expire = 3660;
     for i in 0..4 {
         let edition = KeyEdition::try_from(i).unwrap();
-        let new_key = generate_key(edition, 1,  Date {day: 1, month: 1, year: 2020}.enc(), 0, 3660);
-        println!(" generated key {} for edition {:?}", new_key, edition);
-        println!("   └ is valid: {}", is_valid_key(new_key));
+        let key = generate_key(edition, license_count, purchase_date, license_expire, maintance_expire);
+        println!("generated key {} for edition {:?}", key, edition);
     }
 }
