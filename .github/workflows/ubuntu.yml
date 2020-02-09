@@ -1,0 +1,18 @@
+name: Ubuntu
+
+on:
+  push:
+    paths:
+    - 'src/**'
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Build
+      run: cargo build --verbose
+    - name: Run tests
+      run: cargo test --verbose
