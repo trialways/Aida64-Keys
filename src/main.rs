@@ -191,6 +191,6 @@ fn main() {
     for i in 0..4 {
         let edition = KeyEdition::try_from(i).unwrap();
         let key = generate_key(edition, license_count, purchase_date, license_expire, maintance_expire);
-        println!("generated key {} for edition {:?}", key, edition);
+        println!("{} -> {:?}", key, edition);
     }
 }
