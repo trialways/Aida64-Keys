@@ -1,6 +1,4 @@
-![MacOS](https://github.com/LeagueRaINi/Aida64-Keygen/workflows/MacOS/badge.svg)
-![Ubuntu](https://github.com/LeagueRaINi/Aida64-Keygen/workflows/Ubuntu/badge.svg)
-![Windows](https://github.com/LeagueRaINi/Aida64-Keygen/workflows/Windows/badge.svg)
+![Windows/Ubuntu/MacOS](https://github.com/LeagueRaINi/Aida64-Keygen/workflows/Windows/Ubuntu/MacOS/badge.svg)
 
 # **This is for educational purposes only!**
 - this project contains methods for generating and verifying aida64 keys
