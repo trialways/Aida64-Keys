@@ -1,4 +1,4 @@
-name: Ubuntu
+name: Windows/Ubuntu/MacOS
 
 on:
   push:
@@ -8,7 +8,10 @@ on:
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest, macos-latest]
 
     steps:
     - uses: actions/checkout@v2
