@@ -3,7 +3,7 @@
 # **This is for educational purposes only!**
 - this project contains methods for generating and verifying aida64 keys
 
-![preview](https://github.com/LeagueRaINi/Aida64-Keygen/blob/master/resources/preview.png)
+![preview](https://github.com/LeagueRaINi/Aida64-Keygen/blob/master/resources/preview.gif)
 
 **Thanks to:**
 - approved for helping reverse some of this
