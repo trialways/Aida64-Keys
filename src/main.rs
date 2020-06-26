@@ -2,26 +2,27 @@ use crate::KeyEdition::{Business, Extreme, Engineer, NetworkAudit};
 use core::convert::TryFrom;
 use std::string::String;
 use rand::{thread_rng, Rng};
+use chrono::Datelike;
 
 #[derive(Debug, Copy, Clone)]
 struct Date {
-    day: i32,
-    month: i32,
+    day: u32,
+    month: u32,
     year: i32
 }
 
 impl Date {
     fn enc(&mut self) -> i32 {
-        self.year = self.year.max(2003).min(2099) - 2003;
-        self.month = self.month.max(2).min(12);
+        self.year = self.year.max(2004).min(2099) - 2003;
+        self.month = self.month.max(1).min(12);
         self.day = self.day.max(1).min(31);
-        (self.year * 512) + (self.month * 32) + self.day
+        (self.year * 512) + ((self.month * 32) + self.day) as i32
     }
 
     fn dec(val: i32) -> Date {
         Date {
-            day: val & 31,
-            month: (val >> 5) & 15,
+            day: val as u32 & 31,
+            month: (val as u32 >> 5) & 15,
             year: ((val >> 9) & 31) + 2003
         }
     }
@@ -124,6 +125,8 @@ fn verify_checksum<T: AsRef<[u8]>>(key: T) -> bool {
     }
 }
 
+// INFO:
+// checks if a given license key is valid, does not check maintance expire date since that doesnt invalidate a key
 fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
     let key = key.as_ref();
     verify_checksum(key) && {
@@ -144,7 +147,7 @@ fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
         let unk2 = (key_parts[0] & 0xFF) ^ (key_parts[3] & 0xFFFF) ^ 0x77;
         let unk3 = (key_parts[0] & 0xFF) ^ (key_parts[4] & 0xFFFF) ^ 0xDF;
         let license_count = key_parts[0] ^ key_parts[5] ^ 0x4755;
-        let purchase_date = key_parts[0] ^ key_parts[6] ^ 0x7CC1;
+        let purchase_date = Date::dec(key_parts[0] ^ key_parts[6] ^ 0x7CC1);
         let expire_val1 = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
         let expire_val2 = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x935;
 
@@ -152,11 +155,60 @@ fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
         unk1 < 990 && unk2 <= 100 &&  unk3 <= 100 &&
         license_count > 0 && license_count < 798 &&
         expire_val1 <= 3660 && expire_val2 > 0 && expire_val2 <= 3660 && (expire_val1 != 3660 || expire_val2 != 1830) &&
-        purchase_date >= 577 && purchase_date <= 49567
+        purchase_date.year >= 2004 && purchase_date.year <= 2099 &&
+        purchase_date.month >= 1 && purchase_date.month <= 12 &&
+        purchase_date.day >= 1 && purchase_date.day <= 31 && {
+            if expire_val1 ==  0 {
+                true
+            } else {
+                let current = chrono::offset::Local::now();
+                let current_days = days_since_1900(current.year(), current.month(), current.day());
+                let purchase_days = days_since_1900(purchase_date.year, purchase_date.month, purchase_date.day);
+                (expire_val1 + purchase_days) - current_days > 0
+            }
+        }
     }
 }
 
-// example method for generating a key
+fn days_since_1900(year: i32, month: u32, day: u32) -> i32 {
+    if year < 1 || year > 9999 || month < 1 || month > 12 || day < 1 {
+        return 0;
+    }
+
+    const DAYS_UNTIL_1900: u32 = 693594;
+    const MONTHS_DAYS: [u32; 12] = [
+        31, 28, 31, 30, 31, 30, 31, 31,
+        30, 31, 30, 31,
+    ];
+    const MONTHS_DAYS_LEAP: [u32; 12] = [
+        31, 29, 31, 30, 31, 30, 31, 31,
+        30, 31, 30, 31
+    ];
+
+    let full_years  = year - 1;
+    let full_months = month - 1;
+    let full_days   = day - 1;
+
+    let is_leap_year = year % 4 == 0 && (year % 100 == 1 || year % 400 == 0);
+    let array = if is_leap_year { MONTHS_DAYS_LEAP } else { MONTHS_DAYS };
+
+    if full_days > array[full_months as usize] {
+        return 0;
+    }
+
+    let leap_days_4    = full_years / 4;   // Every fourth year is a leap year
+    let leap_days_400  = full_years / 400; // Every 400th year is a leap year
+    let fake_leap_days = full_years / 100; // "Leap years" that aren't actually leap years
+
+    let leap_days   = leap_days_4 + leap_days_400 - fake_leap_days;
+    let normal_days = 365 * full_years;
+    
+    let last_year_days = full_days + array[0..full_months as usize].iter().sum::<u32>();
+    let total_days     = last_year_days as i32 + leap_days + normal_days;
+    
+    total_days - DAYS_UNTIL_1900 as i32
+}
+
 fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expire1_val: i32, expire2_val: i32) -> String {
     let mut rng = thread_rng();
     let unk1 = rng.gen_range(100, 989);
@@ -185,12 +237,13 @@ fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expi
 
 fn main() {
     let license_count = 1;
-    let purchase_date = Date {day: 1, month: 2, year: 2020}.enc();
+    let purchase_date = Date {day: 1, month: 1, year: 2011}.enc();
     let license_expire = 0;
     let maintance_expire = 3660;
     for i in 0..4 {
         let edition = KeyEdition::try_from(i).unwrap();
         let key = generate_key(edition, license_count, purchase_date, license_expire, maintance_expire);
-        println!("{} -> {:?}", key, edition);
+        let is_valid = is_valid_key(&key);
+        println!("{} -> {:?}, valid: {}", key, edition, is_valid);
     }
 }
