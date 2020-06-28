@@ -187,12 +187,11 @@ fn days_since_1900(year: i32, month: u32, day: u32) -> i32 {
 
     let full_years  = year - 1;
     let full_months = month - 1;
-    let full_days   = day - 1;
 
-    let is_leap_year = year % 4 == 0 && (year % 100 == 1 || year % 400 == 0);
+    let is_leap_year = year % 4 == 0 && (year % 100 > 0 || year % 400 == 0);
     let array = if is_leap_year { MONTHS_DAYS_LEAP } else { MONTHS_DAYS };
 
-    if full_days > array[full_months as usize] {
+    if day > array[full_months as usize] {
         return 0;
     }
 
@@ -203,7 +202,7 @@ fn days_since_1900(year: i32, month: u32, day: u32) -> i32 {
     let leap_days   = leap_days_4 + leap_days_400 - fake_leap_days;
     let normal_days = 365 * full_years;
     
-    let last_year_days = full_days + array[0..full_months as usize].iter().sum::<u32>();
+    let last_year_days = day + array[0..full_months as usize].iter().sum::<u32>();
     let total_days     = last_year_days as i32 + leap_days + normal_days;
     
     total_days - DAYS_UNTIL_1900 as i32
