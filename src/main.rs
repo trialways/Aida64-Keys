@@ -148,23 +148,23 @@ fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
         let unk3 = (key_parts[0] & 0xFF) ^ (key_parts[4] & 0xFFFF) ^ 0xDF;
         let license_count = key_parts[0] ^ key_parts[5] ^ 0x4755;
         let purchase_date = Date::dec(key_parts[0] ^ key_parts[6] ^ 0x7CC1);
-        let expire_days = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
+        let expire_license = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
         let expire_maintance = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x935;
 
         edition.is_ok() &&
         unk1 >= 100 && unk1 < 990 && unk2 <= 100 &&  unk3 <= 100 &&
         license_count > 0 && license_count < 798 &&
-        expire_days <= 3660 && expire_maintance > 0 && expire_maintance <= 3660 && (expire_days != 3660 || expire_maintance != 1830) &&
+        expire_license <= 3660 && expire_maintance > 0 && expire_maintance <= 3660 && (expire_license != 3660 || expire_maintance != 1830) &&
         purchase_date.year >= 2004 && purchase_date.year <= 2099 &&
         purchase_date.month >= 1 && purchase_date.month <= 12 &&
         purchase_date.day >= 1 && purchase_date.day <= 31 && {
-            if expire_days ==  0 {
+            if expire_license ==  0 {
                 true
             } else {
                 let current = chrono::offset::Local::now();
                 let current_days = days_since_1900(current.year(), current.month(), current.day());
                 let purchase_days = days_since_1900(purchase_date.year, purchase_date.month, purchase_date.day);
-                (expire_days + purchase_days) - current_days > 0
+                (expire_license + purchase_days) - current_days > 0
             }
         }
     }
@@ -208,7 +208,7 @@ fn days_since_1900(year: i32, month: u32, day: u32) -> i32 {
     total_days - DAYS_UNTIL_1900 as i32
 }
 
-fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expire_days: i32, expire_maintance: i32) -> String {
+fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expire_license: i32, expire_maintance: i32) -> String {
     let mut rng = thread_rng();
     let unk1 = rng.gen_range(100, 989);
     let unk2 = rng.gen_range(0, 100) & 0xFFFF;
@@ -224,7 +224,7 @@ fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expi
     enc_part((base_val & 0xFF) ^ unk3 ^ 0xDF, &mut enc_key[6..8]);
     enc_part((base_val & 0xFFFFFF) ^ license_count ^ 0x4755, &mut enc_key[8..12]);
     enc_part((base_val & 0xFFFFFF) ^ purchase_val ^ 0x7CC1, &mut enc_key[12..16]);
-    enc_part((base_val & 0xFF) ^ expire_days ^ 0x3FD, &mut enc_key[16..19]);
+    enc_part((base_val & 0xFF) ^ expire_license ^ 0x3FD, &mut enc_key[16..19]);
     enc_part((base_val & 0xFF) ^ expire_maintance ^ 0x935, &mut enc_key[19..22]);
 
     let mut enc_checksum: [u8; 3] = [0; 3];
