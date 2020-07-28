@@ -12,6 +12,15 @@ struct Date {
 }
 
 impl Date {
+    fn new() -> Date{
+        let datetime = chrono::offset::Local::now();
+        Date {
+            day: datetime.day(),
+            month: datetime.month(),
+            year: datetime.year().min(2099)
+        }
+    }
+
     fn enc(&mut self) -> i32 {
         self.year = self.year.max(2004).min(2099) - 2003;
         self.month = self.month.max(1).min(12);
@@ -236,7 +245,7 @@ fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expi
 
 fn main() {
     let license_count = 1;
-    let purchase_date = Date {day: 1, month: 1, year: 2011}.enc();
+    let purchase_date = Date::new().enc();
     let license_expire = 0;
     let maintance_expire = 3660;
     for i in 0..4 {
