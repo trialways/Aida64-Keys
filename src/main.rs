@@ -12,7 +12,7 @@ struct Date {
 }
 
 impl Date {
-    fn new() -> Date{
+    fn now() -> Date{
         let datetime = chrono::offset::Local::now();
         Date {
             day: datetime.day(),
@@ -245,7 +245,7 @@ fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expi
 
 fn main() {
     let license_count = 1;
-    let purchase_date = Date::new().enc();
+    let purchase_date = Date::now().enc();
     let license_expire = 0;
     let maintance_expire = 3660;
     for i in 0..4 {
