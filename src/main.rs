@@ -158,7 +158,7 @@ fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
         let license_count = key_parts[0] ^ key_parts[5] ^ 0x4755;
         let purchase_date = Date::dec(key_parts[0] ^ key_parts[6] ^ 0x7CC1);
         let expire_license = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
-        let expire_maintance = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x935;
+        let expire_maintance = (key_parts[0] & 0xFF) ^ key_parts[8] ^ 0x935;
 
         edition.is_ok() &&
         unk1 >= 100 && unk1 < 990 && unk2 <= 100 &&  unk3 <= 100 &&
