@@ -1,48 +1,55 @@
-use crate::KeyEdition::{Business, Extreme, Engineer, NetworkAudit};
+use chrono::{Date, Datelike, TimeZone, Utc};
 use core::convert::TryFrom;
-use std::string::String;
+use core::fmt;
 use rand::{thread_rng, Rng};
-use chrono::Datelike;
+use std::ops::{Add, BitAnd, Mul, Shr, Sub};
+use std::string::String;
+use strum::IntoEnumIterator;
+use strum_macros::EnumIter;
 
-#[derive(Debug, Copy, Clone)]
-struct Date {
-    day: u32,
-    month: u32,
-    year: i32
+pub trait DateExt {
+    fn days_since_1900(&self) -> i32;
+    fn enc(&self) -> i32;
+    fn dec(val: i32) -> Date<Utc>;
 }
 
-impl Date {
-    fn now() -> Date{
-        let datetime = chrono::offset::Local::now();
-        Date {
-            day: datetime.day(),
-            month: datetime.month(),
-            year: datetime.year().min(2099)
-        }
+impl DateExt for Date<Utc> {
+    fn days_since_1900(&self) -> i32 {
+        self.sub(Utc.ymd(1900, 1, 1)).num_days() as i32
     }
 
-    fn enc(&mut self) -> i32 {
-        self.year = self.year.max(2004).min(2099) - 2003;
-        self.month = self.month.max(1).min(12);
-        self.day = self.day.max(1).min(31);
-        (self.year * 512) + ((self.month * 32) + self.day) as i32
+    fn enc(&self) -> i32 {
+        let year = self.year().clamp(2004, 2099) - 2003;
+        let month = self.month().clamp(1, 12);
+        let day = self.day().clamp(1, 31);
+        year.mul(512).add(month.mul(32).add(day) as i32)
     }
 
-    fn dec(val: i32) -> Date {
-        Date {
-            day: val as u32 & 31,
-            month: (val as u32 >> 5) & 15,
-            year: ((val >> 9) & 31) + 2003
-        }
+    fn dec(val: i32) -> Date<Utc> {
+        let day = val.bitand(31) as u32;
+        let month = val.shr(5u32).bitand(15) as u32;
+        let year = val.shr(9i32).bitand(31).add(2003);
+        Utc.ymd(year, month, day)
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq, Eq, EnumIter)]
 enum KeyEdition {
     Business = 0,
     Extreme = 1,
     Engineer = 2,
-    NetworkAudit = 3
+    NetworkAudit = 3,
+}
+
+impl fmt::Display for KeyEdition {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        match self {
+            KeyEdition::Business => write!(f, "Business"),
+            KeyEdition::Extreme => write!(f, "Extreme"),
+            KeyEdition::Engineer => write!(f, "Engineer"),
+            KeyEdition::NetworkAudit => write!(f, "Network Audit"),
+        }
+    }
 }
 
 impl TryFrom<i32> for KeyEdition {
@@ -50,10 +57,10 @@ impl TryFrom<i32> for KeyEdition {
 
     fn try_from(value: i32) -> Result<Self, Self::Error> {
         match value {
-            0 => Ok(Business),
-            1 => Ok(Extreme),
-            2 => Ok(Engineer),
-            3 => Ok(NetworkAudit),
+            0 => Ok(KeyEdition::Business),
+            1 => Ok(KeyEdition::Extreme),
+            2 => Ok(KeyEdition::Engineer),
+            3 => Ok(KeyEdition::NetworkAudit),
             _ => Err("Unknown edition"),
         }
     }
@@ -64,10 +71,10 @@ impl TryFrom<&str> for KeyEdition {
 
     fn try_from(value: &str) -> Result<Self, Self::Error> {
         match value {
-            "business" => Ok(Business),
-            "extreme" => Ok(Extreme),
-            "engineer" => Ok(Engineer),
-            "network" => Ok(NetworkAudit),
+            "business" => Ok(KeyEdition::Business),
+            "extreme" => Ok(KeyEdition::Extreme),
+            "engineer" => Ok(KeyEdition::Engineer),
+            "network" => Ok(KeyEdition::NetworkAudit),
             _ => Err("Unknown edition"),
         }
     }
@@ -75,54 +82,38 @@ impl TryFrom<&str> for KeyEdition {
 
 const KEYS_SIZE: i32 = KEY_CHARS.len() as i32;
 const KEY_CHARS: [u8; 34] = [
-    b'D', b'Y', b'1', b'4', b'U', b'F', b'3', b'R', b'H',
-    b'W', b'C', b'X', b'L', b'Q', b'B', b'6', b'I', b'K',
-    b'J', b'T', b'9', b'N', b'5', b'A', b'G', b'S', b'2',
-    b'P', b'M', b'8', b'V', b'Z', b'7', b'E'
+    b'D', b'Y', b'1', b'4', b'U', b'F', b'3', b'R', b'H', b'W', b'C', b'X', b'L', b'Q', b'B', b'6',
+    b'I', b'K', b'J', b'T', b'9', b'N', b'5', b'A', b'G', b'S', b'2', b'P', b'M', b'8', b'V', b'Z',
+    b'7', b'E',
 ];
 
 fn get_checksum<T: AsRef<[u8]>>(key_part: T) -> u16 {
-    (key_part
-        .as_ref()
-        .iter()
-        .fold(0u32, |result, b| {
-            (0..8).fold(result ^ (*b as u32) << 8, |result, _| {
-                if result & 0x8000 == 0 {
-                    result << 1
-                } else {
-                    result << 1 ^ 0x8201
-                }
-            })
+    (key_part.as_ref().iter().fold(0u32, |result, b| {
+        (0..8).fold(result ^ (*b as u32) << 8, |result, _| {
+            if result & 0x8000 == 0 {
+                result << 1
+            } else {
+                result << 1 ^ 0x8201
+            }
+        })
     }) & 0xFFFF) as u16
 }
 
 fn dec_part<T: AsRef<[u8]>>(key_part: T) -> i32 {
-    key_part
-        .as_ref()
-        .iter()
-        .enumerate()
-        .fold(0i32, |result, (_, c1)| {
-            (result * 34) + KEY_CHARS
-                .iter()
-                .position(|&c2| c2 == *c1)
-                .unwrap_or(0) as i32
-        })
+    key_part.as_ref().iter().enumerate().fold(0i32, |result, (_, c1)| {
+        (result * 34) + KEY_CHARS.iter().position(|&c2| c2 == *c1).unwrap_or(0) as i32
+    })
 }
 
 fn enc_part(mut val: i32, slice: &mut [u8]) {
-    slice
-        .iter_mut()
-        .rev()
-        .for_each(|x| {
-            *x = KEY_CHARS[(val % KEYS_SIZE) as usize];
-            val /= KEYS_SIZE;
-        })
+    slice.iter_mut().rev().for_each(|x| {
+        *x = KEY_CHARS[(val % KEYS_SIZE) as usize];
+        val /= KEYS_SIZE;
+    })
 }
 
 fn gen_pair(slice: &mut [u8]) {
-    slice
-        .iter_mut()
-        .for_each(|x| *x = KEY_CHARS[thread_rng().gen_range(0, KEYS_SIZE) as usize])
+    slice.iter_mut().for_each(|x| *x = KEY_CHARS[thread_rng().gen_range(0, KEYS_SIZE) as usize])
 }
 
 fn verify_checksum<T: AsRef<[u8]>>(key: T) -> bool {
@@ -160,64 +151,42 @@ fn is_valid_key<T: AsRef<[u8]>>(key: T) -> bool {
         let expire_license = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
         let expire_maintance = (key_parts[0] & 0xFF) ^ key_parts[8] ^ 0x935;
 
-        edition.is_ok() &&
-        unk1 >= 100 && unk1 < 990 && unk2 <= 100 &&  unk3 <= 100 &&
-        license_count > 0 && license_count < 798 &&
-        expire_license <= 3660 && expire_maintance > 0 && expire_maintance <= 3660 && (expire_license != 3660 || expire_maintance != 1830) &&
-        purchase_date.year >= 2004 && purchase_date.year <= 2099 &&
-        purchase_date.month >= 1 && purchase_date.month <= 12 &&
-        purchase_date.day >= 1 && purchase_date.day <= 31 && {
-            if expire_license ==  0 {
-                true
-            } else {
-                let current = chrono::offset::Local::now();
-                let current_days = days_since_1900(current.year(), current.month(), current.day());
-                let purchase_days = days_since_1900(purchase_date.year, purchase_date.month, purchase_date.day);
-                (expire_license + purchase_days) - current_days > 0
+        edition.is_ok()
+            && unk1 >= 100
+            && unk1 < 990
+            && unk2 <= 100
+            && unk3 <= 100
+            && license_count > 0
+            && license_count < 798
+            && expire_license <= 3660
+            && expire_maintance > 0
+            && expire_maintance <= 3660
+            && (expire_license != 3660 || expire_maintance != 1830)
+            && purchase_date.year() >= 2004
+            && purchase_date.year() <= 2099
+            && purchase_date.month() >= 1
+            && purchase_date.month() <= 12
+            && purchase_date.day() >= 1
+            && purchase_date.day() <= 31
+            && {
+                if expire_license == 0 {
+                    true
+                } else {
+                    let current_days = Utc::today().enc();
+                    let purchase_days = purchase_date.enc();
+                    (expire_license + purchase_days) - current_days > 0
+                }
             }
-        }
     }
 }
 
-fn days_since_1900(year: i32, month: u32, day: u32) -> i32 {
-    if year < 1 || year > 9999 || month < 1 || month > 12 || day < 1 {
-        return 0;
-    }
-
-    const DAYS_UNTIL_1900: u32 = 693594;
-    const MONTHS_DAYS: [u32; 12] = [
-        31, 28, 31, 30, 31, 30, 31, 31,
-        30, 31, 30, 31,
-    ];
-    const MONTHS_DAYS_LEAP: [u32; 12] = [
-        31, 29, 31, 30, 31, 30, 31, 31,
-        30, 31, 30, 31
-    ];
-
-    let full_years  = year - 1;
-    let full_months = month - 1;
-
-    let is_leap_year = year % 4 == 0 && (year % 100 > 0 || year % 400 == 0);
-    let array = if is_leap_year { MONTHS_DAYS_LEAP } else { MONTHS_DAYS };
-
-    if day > array[full_months as usize] {
-        return 0;
-    }
-
-    let leap_days_4    = full_years / 4;   // Every fourth year is a leap year
-    let leap_days_400  = full_years / 400; // Every 400th year is a leap year
-    let fake_leap_days = full_years / 100; // "Leap years" that aren't actually leap years
-
-    let leap_days   = leap_days_4 + leap_days_400 - fake_leap_days;
-    let normal_days = 365 * full_years;
-    
-    let last_year_days = day + array[0..full_months as usize].iter().sum::<u32>();
-    let total_days     = last_year_days as i32 + leap_days + normal_days;
-    
-    total_days - DAYS_UNTIL_1900 as i32
-}
-
-fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expire_license: i32, expire_maintance: i32) -> String {
+fn generate_key(
+    edition: KeyEdition,
+    license_count: i32,
+    purchase_val: i32,
+    expire_license: i32,
+    expire_maintance: i32,
+) -> String {
     let mut rng = thread_rng();
     let unk1 = rng.gen_range(100, 989);
     let unk2 = rng.gen_range(0, 100) & 0xFFFF;
@@ -244,14 +213,8 @@ fn generate_key(edition: KeyEdition, license_count: i32, purchase_val: i32, expi
 }
 
 fn main() {
-    let license_count = 1;
-    let purchase_date = Date::now().enc();
-    let license_expire = 0;
-    let maintance_expire = 3660;
-    for i in 0..4 {
-        let edition = KeyEdition::try_from(i).unwrap();
-        let key = generate_key(edition, license_count, purchase_date, license_expire, maintance_expire);
-        let is_valid = is_valid_key(&key);
-        println!("{} -> {:?}, valid: {}", key, edition, is_valid);
+    for edition in KeyEdition::iter() {
+        let key = generate_key(edition, 1, Utc::today().enc(), 0, 3660);
+        println!("{} -> {}, valid: {}", key, edition, is_valid_key(&key));
     }
 }

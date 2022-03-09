@@ -1,9 +1,11 @@
 [package]
 name = "aida64_keygen"
-version = "0.1.0"
-authors = ["RaINi_"]
-edition = "2018"
+version = "0.1.1"
+authors = ["LeagueRaINi"]
+edition = "2021"
 
 [dependencies]
-rand = "0.7.3"
-chrono = "0.4.11"
+rand = "0.7"
+chrono = "0.4"
+strum = "0.24"
+strum_macros = "0.24"
