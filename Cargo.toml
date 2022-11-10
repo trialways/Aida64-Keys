@@ -1,11 +1,19 @@
-[package]
-name = "aida64_keygen"
-version = "0.1.1"
-authors = ["LeagueRaINi"]
-edition = "2021"
+[workspace]
 
-[dependencies]
-rand = "0.7"
-chrono = "0.4"
-strum = "0.24"
-strum_macros = "0.24"
+members = [
+    "aida64-keys-cli",
+    "aida64-keys-gui",
+
+    "aida64-keys-lib",
+]
+
+[profile.release]
+opt-level = 3
+debug = false
+rpath = false
+debug-assertions = false
+panic = 'abort'
+incremental = false
+overflow-checks = false
+lto = true
+codegen-units = 1

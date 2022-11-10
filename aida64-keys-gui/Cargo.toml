@@ -1,0 +1,17 @@
+[package]
+name = "aida64-keys-gui"
+version = "0.1.0"
+authors = ["LeagueRaINi"]
+edition = "2021"
+
+[dependencies]
+aida64-keys-lib = { path = "../aida64-keys-lib" }
+
+egui-datepicker = { git = "https://github.com/LeagueRaINi/egui-datepicker", branch = "month-control-button" }
+
+rand = "0.7"
+chrono = "0.4"
+eframe = "0.17"
+strum = "0.24"
+strum_macros = "0.24"
+clipboard = "0.5"
