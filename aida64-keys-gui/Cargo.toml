@@ -9,9 +9,7 @@ aida64-keys-lib = { path = "../aida64-keys-lib" }
 
 egui-datepicker = { git = "https://github.com/LeagueRaINi/egui-datepicker", branch = "month-control-button" }
 
-rand = "0.7"
+eframe = "0.19"
 chrono = "0.4"
-eframe = "0.17"
 strum = "0.24"
-strum_macros = "0.24"
 clipboard = "0.5"

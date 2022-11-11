@@ -102,7 +102,7 @@ pub struct License {
     pub edition: KeyEdition,
     pub seats: i32,
     pub purchase_date: Date<Utc>,
-    pub expiry: Option<Date<Utc>>,
+    pub expiry: Option<Duration>,
     pub maintenance_expiry: Duration,
 
     unk1: i32,
@@ -146,8 +146,8 @@ impl License {
         self
     }
 
-    pub fn with_license_expiry(mut self, date: Option<Date<Utc>>) -> Self {
-        self.expiry = date;
+    pub fn with_license_expiry(mut self, duration: Option<Duration>) -> Self {
+        self.expiry = duration;
         self
     }
 
@@ -192,7 +192,7 @@ impl License {
         let expiry = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
         let expiry = match expiry {
             0 => None,
-            _ => Some(Date::dec(expiry)),
+            _ => Some(Date::dec(expiry) - purchase_date),
         };
 
         let maintenance_expiry = (key_parts[0] & 0xFF) ^ key_parts[8] ^ 0x935;
@@ -210,7 +210,7 @@ impl License {
         gen_pair(&mut enc_key[22..24]);
 
         let purchase_date = self.purchase_date.enc();
-        let expiry = self.expiry.map(|exp| exp.enc() - purchase_date).unwrap_or(0);
+        let expiry = self.expiry.map(|exp| exp.num_days()).unwrap_or(0) as i32;
         let maintenance_expiry = self.maintenance_expiry.num_days() as i32;
 
         let base_val = dec_part(&mut enc_key[22..24]);
@@ -248,7 +248,7 @@ impl License {
         if (Utc.ymd(2004, 1, 1)..Utc.ymd(2099, 1, 1)).contains(&self.purchase_date) {
             let current_days = Utc::today().enc();
             let purchase_days = self.purchase_date.enc();
-            let expiry_days = self.expiry.map(|exp| exp.enc()).unwrap_or(0);
+            let expiry_days = self.expiry.map(|exp| exp.num_days()).unwrap_or(0) as i32;
             days_left = (expiry_days + purchase_days) - current_days;
         }
 
