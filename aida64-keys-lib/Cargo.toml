@@ -6,7 +6,7 @@ edition = "2021"
 
 [dependencies]
 rand = "0.7"
-chrono = "0.4"
+chrono = "=0.4.22"
 strum = "0.24"
 strum_macros = "0.24"
 thiserror = "1.0"
