@@ -2,7 +2,7 @@ use chrono::{Date, Datelike, Duration, TimeZone, Utc};
 use core::convert::TryFrom;
 use core::fmt;
 use rand::{thread_rng, Rng};
-use std::ops::{Add, BitAnd, Mul, Shr, Sub};
+use std::ops::{Add, BitAnd, Mul, Shr};
 use std::string::String;
 use strum_macros::EnumIter;
 use thiserror::Error;
@@ -72,16 +72,11 @@ impl TryFrom<&str> for KeyEdition {
 }
 
 trait DateExt {
-    fn days_since_1900(&self) -> i32;
     fn enc(&self) -> i32;
     fn dec(val: i32) -> Date<Utc>;
 }
 
 impl DateExt for Date<Utc> {
-    fn days_since_1900(&self) -> i32 {
-        self.sub(Utc.ymd(1900, 1, 1)).num_days() as i32
-    }
-
     fn enc(&self) -> i32 {
         let year = self.year().clamp(2004, 2099) - 2003;
         let month = self.month().clamp(1, 12);
@@ -91,8 +86,8 @@ impl DateExt for Date<Utc> {
 
     fn dec(val: i32) -> Date<Utc> {
         let day = val.bitand(31) as u32;
-        let month = (val as u32).shr(5u32).bitand(15);
-        let year = val.shr(9i32).bitand(31).add(2003);
+        let month = val.shr(5u32).bitand(15) as u32;
+        let year = val.shr(9u32).bitand(31).add(2003);
         Utc.ymd(year, month, day)
     }
 }
@@ -114,9 +109,9 @@ impl License {
     pub fn new(edition: KeyEdition) -> License {
         let mut rng = thread_rng();
 
-        let unk1 = rng.gen_range(100, 989);
-        let unk2 = rng.gen_range(0, 100) & 0xFFFF;
-        let unk3 = rng.gen_range(0, 100) & 0xFFFF;
+        let unk1: i32 = rng.gen_range(100, 989);
+        let unk2: i32 = rng.gen_range(0, 100);
+        let unk3: i32 = rng.gen_range(0, 100);
 
         License {
             edition,
@@ -132,7 +127,9 @@ impl License {
     }
 
     pub fn with_purchase_date(mut self, date: Date<Utc>) -> Self {
-        self.purchase_date = date.clamp(Utc.ymd(2004, 1, 1), Utc.ymd(2099, 1, 1));
+        let date_2004 = Utc.ymd(2004, 1, 1);
+        let date_2099 = Utc.ymd(2099, 1, 1);
+        self.purchase_date = date.clamp(date_2004, date_2099);
         self
     }
 
@@ -172,7 +169,6 @@ impl License {
         }
 
         let key_parts: [i32; 9] = [
-            dec_part(&key[22..24]),
             dec_part(&key[0..2]),
             dec_part(&key[2..4]),
             dec_part(&key[4..6]),
@@ -181,26 +177,27 @@ impl License {
             dec_part(&key[12..16]),
             dec_part(&key[16..19]),
             dec_part(&key[19..22]),
+            dec_part(&key[22..24]),
         ];
 
-        let edition = ((key_parts[0] & 0xFF) ^ key_parts[1] ^ 0xBF) - 1;
+        let edition = ((key_parts[8] & 0xFF) ^ key_parts[0] ^ 0xBF) - 1;
         let edition = KeyEdition::try_from(edition)?;
 
-        let seats = key_parts[0] ^ key_parts[5] ^ 0x4755;
-        let purchase_date = Date::dec(key_parts[0] ^ key_parts[6] ^ 0x7CC1);
+        let seats = key_parts[8] ^ key_parts[4] ^ 0x4755;
+        let purchase_date = Date::dec(key_parts[8] ^ key_parts[5] ^ 0x7CC1);
 
-        let expiry = (key_parts[0] & 0xFF) ^ key_parts[7] ^ 0x3FD;
+        let expiry = (key_parts[8] & 0xFF) ^ key_parts[6] ^ 0x3FD;
         let expiry = match expiry {
             0 => None,
             _ => Some(Date::dec(expiry) - purchase_date),
         };
 
-        let maintenance_expiry = (key_parts[0] & 0xFF) ^ key_parts[8] ^ 0x935;
+        let maintenance_expiry = (key_parts[8] & 0xFF) ^ key_parts[7] ^ 0x935;
         let maintenance_expiry = Duration::days(maintenance_expiry as i64);
 
-        let unk1 = (key_parts[0] & 0xFF) ^ key_parts[2] ^ 0xED;
-        let unk2 = (key_parts[0] & 0xFF) ^ (key_parts[3] & 0xFFFF) ^ 0x77;
-        let unk3 = (key_parts[0] & 0xFF) ^ (key_parts[4] & 0xFFFF) ^ 0xDF;
+        let unk1 = (key_parts[8] & 0xFF) ^ key_parts[1] ^ 0xED;
+        let unk2 = (key_parts[8] & 0xFF) ^ (key_parts[2] & 0xFFFF) ^ 0x77;
+        let unk3 = (key_parts[8] & 0xFF) ^ (key_parts[3] & 0xFFFF) ^ 0xDF;
 
         Ok(License { edition, seats, purchase_date, expiry, maintenance_expiry, unk1, unk2, unk3 })
     }
@@ -225,6 +222,7 @@ impl License {
 
         let mut enc_checksum: [u8; 3] = [0; 3];
         enc_part(get_checksum(&mut enc_key[0..24]) as i32, &mut enc_checksum);
+
         enc_key[24] = enc_checksum[1];
         enc_key
     }
@@ -245,16 +243,19 @@ impl License {
     pub fn is_valid_key(&self) -> bool {
         let mut days_left = 0;
 
-        if (Utc.ymd(2004, 1, 1)..Utc.ymd(2099, 1, 1)).contains(&self.purchase_date) {
+        let date_2004 = Utc.ymd(2004, 1, 1);
+        let date_2099 = Utc.ymd(2099, 1, 1);
+
+        if (date_2004..=date_2099).contains(&self.purchase_date) {
             let current_days = Utc::today().enc();
             let purchase_days = self.purchase_date.enc();
             let expiry_days = self.expiry.map(|exp| exp.num_days()).unwrap_or(0) as i32;
-            days_left = (expiry_days + purchase_days) - current_days;
+            days_left = (expiry_days + purchase_days) - current_days
         }
 
         (self.expiry.is_none() || days_left > 0)
             && (0..797).contains(&self.seats)
-            && (100..999).contains(&self.unk1)
+            && (99..990).contains(&self.unk1)
             && self.unk2 <= 100
             && self.unk3 <= 100
             && self.maintenance_expiry.num_days() < 3659
@@ -297,16 +298,38 @@ fn verify_checksum<T: AsRef<[u8]>>(key: T) -> bool {
     key.len() == 25 && {
         let mut enc_checksum: [u8; 3] = [0; 3];
         enc_part(get_checksum(&key[0..24]) as i32, &mut enc_checksum);
+
         enc_checksum[1] == key[24]
     }
 }
 
 #[cfg(test)]
 mod tests {
+    use strum::IntoEnumIterator;
+
     use super::*;
 
     #[test]
     fn parse_license() {
-        License::from_key("4HPLUPDBD6F7DTJFDAEYASM2Q").unwrap();
+        assert!(
+            License::from_key("  3BH41-94ZD6 4KDT5JD-PUY_TBSN9 ").unwrap().is_valid_key(),
+            "parsed valid license as invalid!"
+        );
+
+        assert!(
+            License::from_key("  3BH41-94ZD6 4KDT5JD-PUY_TBSN2 ").is_err(),
+            "parsed license did not trip the checksum check!"
+        );
+    }
+
+    #[test]
+    fn generate() {
+        for edition in KeyEdition::iter() {
+            assert!(License::new(edition).is_valid_key(), "generated invalid license!");
+            assert!(
+                License::new(edition).with_license_expiry(Some(Duration::days(50))).is_valid_key(),
+                "generated invalid license when using an expiry!"
+            );
+        }
     }
 }
