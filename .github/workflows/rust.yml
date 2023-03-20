@@ -1,6 +1,13 @@
 name: Windows/Ubuntu/MacOS
 
-on: [workflow_dispatch]
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+    paths: [ '**.rs', '**.toml' ]
+
+env:
+  CARGO_TERM_COLOR: always
 
 jobs:
   build:
@@ -8,10 +15,10 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [windows-latest, ubuntu-latest, macos-latest]
+        os: [ windows-latest, ubuntu-latest, macos-latest ]
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Build
       run: cargo build --verbose
     - name: Run tests
