@@ -1,7 +1,7 @@
 name: Ubuntu/Windows/MacOS
 
 on:
-  #workflow_dispatch:
+  workflow_dispatch:
   push:
     branches: [ "master" ]
     paths: [ "**.rs", "**.toml" ]
