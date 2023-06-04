@@ -57,21 +57,7 @@ jobs:
       #  name: win_64-keysGUI
       #  path: ./target/x86_64-pc-windows-gnu/debug/aida64-keys-gui.exe
       
-   Third_job:
-      name: MacOS
-      runs-on: macos-latest
 
-      steps:
-      - run: brew install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
-      - name: Set up Xcode
-      - uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-      - uses: actions/checkout@v3
-      - name: Build
-        run: cargo build --verbose
-      #- name: Run tests
-         #run: cargo test --workspace --exclude aida64-keys-gui --verbose
     
       - name: add MacOS-dmg
         run: rustup target add MacOS-dmg
