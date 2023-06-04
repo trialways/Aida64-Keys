@@ -1,4 +1,4 @@
-name: Ubuntu/MacOS/Windows
+name: Ubuntu/Windows/MacOS
 
 on:
   workflow_dispatch:
@@ -30,10 +30,8 @@ jobs:
     #  with:
      #   name: Linux_File
       #  path: ./target/debug/
-  
-  
-  
-  Third_job:
+      
+  Second_job:
     name: Windows
     runs-on: windows-latest
     
