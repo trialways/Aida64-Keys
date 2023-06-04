@@ -18,6 +18,5 @@ jobs:
     - uses: maxim-lobanov/setup-xcode@v1
       with:
         xcode-version: latest
-    - run: brew install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
 
     
