@@ -10,7 +10,8 @@ env:
   CARGO_TERM_COLOR: always
 
 jobs:
-  First_job:
+  
+   First_job:
     name: Linux
     runs-on: ubuntu-latest
     #runs-on: ${{ matrix.os }}
@@ -30,8 +31,8 @@ jobs:
     #  with:
      #   name: Linux_File
       #  path: ./target/debug/
-      
-  Second_job:
+     
+   Second_job:
     name: Windows
     runs-on: windows-latest
     
@@ -56,7 +57,7 @@ jobs:
       #  name: win_64-keysGUI
       #  path: ./target/x86_64-pc-windows-gnu/debug/aida64-keys-gui.exe
       
-  Third_job:
+   Third_job:
       name: MacOS
       runs-on: macos-latest
 
