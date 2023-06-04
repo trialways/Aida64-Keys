@@ -2,7 +2,9 @@ name: Ubuntu/MacOS/Windows
 
 on:
   workflow_dispatch:
-
+  push:
+    branches: [ "master" ]
+    paths: [ "**.rs", "**.toml" ]
 
 env:
   CARGO_TERM_COLOR: always
@@ -34,7 +36,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - run: brew install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
+    #- run: brew install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
     - name: Set up Xcode
     - uses: maxim-lobanov/setup-xcode@v1
       with:
