@@ -1,0 +1,23 @@
+name: MacOS
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "master" ]
+    paths: [ "**.rs", "**.toml" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: macos-latest
+    steps:
+
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest
+    - run: brew install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
+
+    
