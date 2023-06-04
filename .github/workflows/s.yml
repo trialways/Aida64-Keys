@@ -56,16 +56,3 @@ jobs:
      # with:
       #  name: win_64-keysGUI
       #  path: ./target/x86_64-pc-windows-gnu/debug/aida64-keys-gui.exe
-      
-
-    
-      - name: add MacOS-dmg
-        run: rustup target add MacOS-dmg
-      - name: make MacOS-app-dmg
-        run: cargo build --target MacOS-dmg
-      
-      - name : Upload artifact
-        uses: actions/upload-artifact@master
-        with:
-          name: MacOS_DMG
-          path: ./target
