@@ -21,14 +21,14 @@ jobs:
      - uses: actions/checkout@v3
      - name: Build
        run: cargo build --verbose
-     - name: add MacOS-dmg
-       run: rustup target add MacOS-dmg
-     - name: make MacOS-app-dmg
-       run: cargo build --target MacOS-dmg
+     #- name: add MacOS-dmg
+      # run: rustup target add MacOS-dmg
+     #- name: make MacOS-app-dmg
+      # run: cargo build --target MacOS-dmg
       
      - name : Upload artifact
        uses: actions/upload-artifact@master
        with:
          name: MacOS_DMG
-         path: ./target  
+         path: ./
     
