@@ -17,5 +17,7 @@ jobs:
      - uses: maxim-lobanov/setup-xcode@v1
        with:
          xcode-version: latest
-
+     - uses: actions/checkout@v3
+     - name: Build
+       run: cargo build --verbose
     
