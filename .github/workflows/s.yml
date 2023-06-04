@@ -1,0 +1,81 @@
+name: Ubuntu/MacOS/Windows
+
+on:
+  workflow_dispatch:
+
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  First_job:
+    name: Linux
+    runs-on: ubuntu-latest
+    #runs-on: ${{ matrix.os }}
+    #strategy:
+      #matrix:
+        #os: [ubuntu-latest]
+       # os: [ubuntu-latest, macos-latest ]
+    steps:
+    - run: sudo apt-get install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose
+    #- name: Run tests
+       #run: cargo test --workspace --exclude aida64-keys-gui --verbose
+    #- name : Upload artifact
+     # uses: actions/upload-artifact@master
+    #  with:
+     #   name: Linux_File
+      #  path: ./target/debug/
+  
+  Second_job:
+    name: MacOS
+    runs-on: macos-latest
+
+    steps:
+    - run: brew install pkg-config cmake build-essential libxcb-composite0-dev libfontconfig1-dev
+    - name: Set up Xcode
+    - uses: maxim-lobanov/setup-xcode@v1
+      with:
+        xcode-version: latest
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose
+    #- name: Run tests
+       #run: cargo test --workspace --exclude aida64-keys-gui --verbose
+    
+    - name: add MacOS-dmg
+      run: rustup target add MacOS-dmg
+    - name: make MacOS-app-dmg
+      run: cargo build --target MacOS-dmg
+      
+    - name : Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: MacOS_DMG
+        path: ./target
+  
+  Third_job:
+    name: Windows
+    runs-on: windows-latest
+    
+    steps:
+    - name: Set up MinGW
+      uses: egor-tensin/setup-mingw@v2
+      with:
+        platform: x64
+    - uses: actions/checkout@v3
+    - name: Build
+      run: cargo build --verbose
+    #- name: Run tests
+     # run: cargo test --workspace --exclude aida64-keys-gui --verbose
+    - name: add x86_64-pc-windows-gnu
+      run: rustup target add x86_64-pc-windows-gnu
+    - name: make win-gui
+      run: cargo build --target x86_64-pc-windows-gnu
+    #- name : Upload artifact
+    #  uses: actions/upload-artifact@master
+     # with:
+      #  name: win_64-keysGUI
+      #  path: ./target/x86_64-pc-windows-gnu/debug/aida64-keys-gui.exe
