@@ -1,4 +1,4 @@
-name: Ubuntu/Windows/MacOS
+name: Ubuntu/Windows
 
 on:
   workflow_dispatch:
