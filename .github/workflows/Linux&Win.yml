@@ -30,8 +30,9 @@ jobs:
       uses: actions/upload-artifact@master
       with:
         name: Linux_file_Genkeys
-        path: ./target/debug/aida64-keys-cli
-              ./target/debug/aida64-keys-gui
+        path: |
+          ./target/debug/aida64-keys-cli
+          ./target/debug/aida64-keys-gui
         
   Second_job:
      name: Windows
