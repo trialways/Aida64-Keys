@@ -26,12 +26,12 @@ jobs:
       run: cargo build --verbose
     #- name: Run tests
        #run: cargo test --workspace --exclude aida64-keys-gui --verbose
-    #- name : Upload artifact
-     # uses: actions/upload-artifact@master
-    #  with:
-     #   name: Linux_File
-      #  path: ./target/debug/
-     
+    - name : Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: Linux_file_Genkeys
+        path: ./target/debug/aida64-keys-cli && ./target/debug/aida64-keys-gui
+        
    Second_job:
     name: Windows
     runs-on: windows-latest
@@ -51,8 +51,8 @@ jobs:
       run: rustup target add x86_64-pc-windows-gnu
     - name: make win-gui
       run: cargo build --target x86_64-pc-windows-gnu
-    #- name : Upload artifact
-    #  uses: actions/upload-artifact@master
-     # with:
-      #  name: win_64-keysGUI
-      #  path: ./target/x86_64-pc-windows-gnu/debug/aida64-keys-gui.exe
+    - name : Upload artifact
+      uses: actions/upload-artifact@master
+      with:
+        name: win_64-GenkeysGUI
+        path: ./target/x86_64-pc-windows-gnu/debug/aida64-keys-gui.exe
