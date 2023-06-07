@@ -27,7 +27,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-         brew install cmake libxcomposite pkg-config libfontconfig
+         brew install libxcomposite pkg-config fontconfig
          brew install --cask cmake
    # pkg-config cmake libxcb-composite0-dev libfontconfig1-dev
 
