@@ -40,7 +40,7 @@ jobs:
         run: npm install create-dmg -g
 
       - name: Build application
-        run: cargo build --release
+        run: cargo build --verbose
 
       - name: Create DMG file
         run: create-dmg ./target/debug ./output --volname "MyApp" --icon "icon.icns"
