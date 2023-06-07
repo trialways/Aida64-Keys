@@ -14,37 +14,29 @@ jobs:
     runs-on: macos-latest
 
     steps:
-     
-    ######  - name: Install Homebrew
-     ######   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-    ######  - name: Update Homebrew
-      ######  run: brew update
-     ###### - name: Install dependencies
-      ######  run: 
-        ###### brew install libxcomposite pkg-config fontconfig
-         #brew install --cask cmake
-   # pkg-config cmake libxcb-composite0-dev libfontconfig1-dev
+      - name: Checkout Repository
+        uses: actions/checkout@v2
 
-      - name: Checkout code
-        uses: actions/checkout@v3
-      #- name: Setup Rust
-       # uses: actions/setup-rust@v2
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          override: true
 
-      #- name: Setup Xcode
-       # uses: maxim-lobanov/setup-xcode@v1
-        #with:
-         # xcode-version: latest
-      - name: build
-        run: cargo build --release
+      - name: Build
+        run: cargo build --verbose
+
       - name: Install create-dmg
-        run: npm install create-dmg -g
-      - name: Create DMG 
-        run: create-dmg ./target/release/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./path/to/icon.icns"
-      - name: Upload DMG artifact
+        run: npm install -g create-dmg
+
+      - name: Create DMG
+        run: create-dmg ./target/debug/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./path/to/icon.icns"
+
+      - name: Upload DMG
         uses: actions/upload-artifact@v2
         with:
-          name: aida64-keys-dmg
-          path: output/Aida64-Keys.dmg
+          name: Aida64-Keys.dmg
+          path: ./output/Aida64-Keys.dmg
 
  
 
