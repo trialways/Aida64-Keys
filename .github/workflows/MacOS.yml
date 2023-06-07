@@ -14,10 +14,7 @@ jobs:
     runs-on: macos-latest
 
     steps:
-      ######- name: Setup Xcode
-       ###### uses: maxim-lobanov/setup-xcode@v1
-      ######  with:
-        ######  xcode-version: latest
+     
     ######  - name: Install Homebrew
      ######   run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
     ######  - name: Update Homebrew
@@ -30,42 +27,26 @@ jobs:
 
       - name: Checkout code
         uses: actions/checkout@v3
+      - name: Setup Rust
+        uses: actions/setup-rust@v2
 
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: latest
-
+      #- name: Setup Xcode
+       # uses: maxim-lobanov/setup-xcode@v1
+        #with:
+         # xcode-version: latest
+      - name: build
+        run: cargo build --release
       - name: Install create-dmg
         run: npm install create-dmg -g
-
-      - name: Build application
-        run: cargo build --verbose
-
-      - name: Create DMG file
-        run: |
-         mkdir -p ./target/debug/aida64-keys-gui/Contents
-         touch ./target/debug/aida64-keys-gui/Contents/Info.plist
-         create-dmg ./target/debug/aida64-keys-gui ./output --volname "MyApp" --icon "icon.icns"
-
+      - name: Create DMG 
+        run: creat-dmg ./target/release/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./path/to/icon.icns"
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v2
         with:
-          name: MyApp.dmg
-          path: ./output/MyApp.dmg
+          name: aida64-keys-dmg
+          path: output/Aida64-Keys.dmg
 
-     ###### - name: Build
-       ###### run: cargo build --verbose
+ 
 
-      #- name: Add MacOS-dmg target
-        #run: rustup target add x86_64-apple-darwin
 
-      #- name: Build MacOS app-dmg
-        #run: cargo build --target x86_64-apple-darwin
-
-    ######  - name: Upload artifact
-      ######  uses: actions/upload-artifact@master
-     ######   with:
-      ######    name: MacOS_DMG
-      ######    path: ./
     
