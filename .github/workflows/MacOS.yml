@@ -1,10 +1,9 @@
 name: MacOS
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ "master" ]
-    paths: [ "**.rs", "**.toml" ]
+    branches: [master]
+  workflow_dispatch:
 
 env:
   CARGO_TERM_COLOR: always
@@ -23,24 +22,17 @@ jobs:
           toolchain: stable
           override: true
 
-      - name: Build
-        run: cargo build --verbose
-
       - name: Install create-dmg
         run: npm install -g create-dmg
 
+      - name: Build
+        run: cargo build --release
+
       - name: Create DMG
-        run: |
-         mkdir -p ./target/debug/aida64-keys-gui/Contents
-         touch ./target/debug/aida64-keys-gui/Contents/Info.plistcreate-dmg ./target/debug/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./workflows/icon.icns"
+        run: create-dmg ./target/release/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns
 
       - name: Upload DMG
         uses: actions/upload-artifact@v2
         with:
           name: Aida64-Keys.dmg
           path: ./output/Aida64-Keys.dmg
-
- 
-
-
-    
