@@ -14,10 +14,10 @@ jobs:
 
     steps:
       - name: Checkout Repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
+        uses: actions-rs/toolchain@main
         with:
           toolchain: stable
           override: true
@@ -26,10 +26,10 @@ jobs:
         run: npm install -g create-dmg
 
       - name: Build
-        run: cargo build --release
+        run: cargo build --verbose
 
       - name: Create DMG
-        run: create-dmg ./target/release/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns
+        run: create-dmg ./target ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns
 
       - name: Upload DMG
         uses: actions/upload-artifact@v2
