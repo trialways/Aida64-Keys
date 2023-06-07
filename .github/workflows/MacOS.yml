@@ -43,7 +43,7 @@ jobs:
         run: cargo build --release
 
       - name: Create DMG file
-        run: create-dmg ./path/to/app ./output --volname "MyApp" --icon "icon.icns"
+        run: create-dmg ./target/debug ./output --volname "MyApp" --icon "icon.icns"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v2
