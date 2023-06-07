@@ -39,7 +39,7 @@ jobs:
       - name: Install create-dmg
         run: npm install create-dmg -g
       - name: Create DMG 
-        run: creat-dmg ./target/release/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./path/to/icon.icns"
+        run: create-dmg ./target/release/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./path/to/icon.icns"
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v2
         with:
