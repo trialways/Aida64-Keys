@@ -43,7 +43,7 @@ jobs:
         run: cargo build --verbose
 
       - name: Create DMG file
-        run: create-dmg /Users/runner/work/Aida64-Keys/Aida64-Keys/aida64-keys-gui ./output --volname "MyApp" --icon "icon.icns"
+        run: create-dmg ./target/debug/aida64-keys-gui ./output --volname "MyApp" --icon "icon.icns"
 
       - name: Upload DMG artifact
         uses: actions/upload-artifact@v2
