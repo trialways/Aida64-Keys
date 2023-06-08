@@ -34,7 +34,7 @@ jobs:
     #    run: mkdir -p ${{ github.workspace }}/output
      #   working-directory: ${{ github.workspace }}
       - name: Install create-dmg
-        run: brew upgrade create-dmg -g
+        run: npm install -g create-dmg@latest
       - name: Create Output Directory
         run: mkdir -p ${{ github.workspace }}/output
         working-directory: ${{ github.workspace }}
