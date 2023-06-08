@@ -30,7 +30,7 @@ jobs:
       - name: Add x86_64-Apple-darwin
         run: rustup target add stable-x86_64-Apple-darwin
       - name: Make
-        run: cargo build --target stable-x86_64-Apple-darwin
+        run: cargo build --target x86_64-Apple-darwin
 
       - name: Create DMG
         run: create-dmg ./target/stable-X86_64-Apple-darwin/debug ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
