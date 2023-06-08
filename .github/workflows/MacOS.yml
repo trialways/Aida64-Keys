@@ -35,11 +35,12 @@ jobs:
         #  name: For_Macos
          # path: ./
       
-      - name: mkdir
-        run: mkdir -p output
+ 
       
       - name: Create DMG
-        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "/.github/workflows/icon.icns"
+        run: | 
+          mkdir -p output
+          create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "/.github/workflows/icon.icns"
 
       - name: Upload DMG
         uses: actions/upload-artifact@master
