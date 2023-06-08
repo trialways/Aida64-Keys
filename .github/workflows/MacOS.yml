@@ -35,8 +35,8 @@ jobs:
         #  name: For_Macos
          # path: ./
       - name: Create Output Directory
-        run: mkdir -p $GITHUB_WORKSPACE/output
-        working-directory: $GITHUB_WORKSPACE
+        run: mkdir -p ${{ github.workspace }}/output
+        working-directory: ${{ github.workspace }}
         
       - name: Upload test
         uses: actions/upload-artifact@master
@@ -45,8 +45,8 @@ jobs:
           path: ./
       
       - name: Create DMG
-        run: create-dmg $GITHUB_WORKSPACE/target/x86_64-apple-darwin/debug/aida64-keys-gui $GITHUB_WORKSPACE/output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "$GITHUB_WORKSPACE/.github/workflows/icon.icns"
-        working-directory: $GITHUB_WORKSPACE
+        run: create-dmg ${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui ${{ github.workspace }}/output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
+        working-directory: ${{ github.workspace }}
       
       - name: Upload DMG
         uses: actions/upload-artifact@master
