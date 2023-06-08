@@ -1,9 +1,7 @@
 name: Build and Deploy DMG
 
 on:
-  
-    workflow_dispatch
-      # 修改为您所需的分支
+  workflow_dispatch:
     
 jobs:
   build:
