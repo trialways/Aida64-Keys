@@ -40,22 +40,22 @@ jobs:
         working-directory: ${{ github.workspace }}
 
       - name: Set Output Path
-        run: echo "::set-env name=OUTPUT_PATH::${{ github.workspace }}/output/Aida64-Keys.dmg"
+        run: echo "OUTPUT_PATH=${{ github.workspace }}/output/Aida64-Keys.dmg" >> $GITHUB_ENV
         working-directory: ${{ github.workspace }}
 
       - name: Create DMG
-        run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "$OUTPUT_PATH" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
+        run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ env.OUTPUT_PATH }}" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
         working-directory: ${{ github.workspace }}
 
       - name: Check Output File
         run: |
-         ls -al $OUTPUT_PATH
+         ls -al "${{ env.OUTPUT_PATH }}"
          echo "Output File Exists"
 
       - name: Upload DMG
         uses: actions/upload-artifact@master
         with:
           name: Aida64Keys.dmg
-          path: $OUTPUT_PATH
+          path: ${{ env.OUTPUT_PATH }}
          
          
