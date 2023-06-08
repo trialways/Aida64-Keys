@@ -31,12 +31,17 @@ jobs:
         run: rustup target add x86_64-apple-darwin
       - name: Make
         run: cargo build --target x86_64-apple-darwin
+      - name: Upload 
+        uses: actions/upload-artifact@v2
+        with:
+          name: For_Macos
+          path: ./
 
       - name: Create DMG
         run: create-dmg ./target/x86_64-Apple-darwin/debug ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
 
-      - name: Upload DMG
-        uses: actions/upload-artifact@v2
-        with:
-          name: Aida64-Keys.dmg
-          path: ./output/Aida64-Keys.dmg
+  #    - name: Upload DMG
+   #     uses: actions/upload-artifact@v2
+    #    with:
+     #     name: Aida64-Keys.dmg
+      #    path: ./output/Aida64-Keys.dmg
