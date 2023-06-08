@@ -33,29 +33,35 @@ jobs:
    #   - name: Create Output Directory
     #    run: mkdir -p ${{ github.workspace }}/output
      #   working-directory: ${{ github.workspace }}
-      
       - name: Install create-dmg
-        run: brew install create-dmg -g 
+        run: brew install create-dmg -g
+
       - name: Set permissions folder
         run: chmod -R 777 ./target
-        
+
       - name: Check Target Folder
         run: |
          ls -al ./target/x86_64-apple-darwin/
          echo "Target Folder Exists"
-        
+
+      - name: Create Output Directory
+        run: mkdir -p ${{ github.workspace }}/output
+        working-directory: ${{ github.workspace }}
+
       - name: Create DMG
-        run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ github.workspace }}/target" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
-        working-directory: ${{ github.workspace }}     
-      
+        run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ github.workspace }}/output/Aida64-Keys.dmg" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
+        working-directory: ${{ github.workspace }}
+
       - name: Check Output File
         run: |
-         ls -al ./target/Aida64-Keys.dmg
+         ls -al ./output/Aida64-Keys.dmg
          echo "Output File Exists"
-        
-      
-      - name: Upload DMG
+
+      - name: Upload DMG 
         uses: actions/upload-artifact@master
         with:
-          name: Aida64Keys.dmg
-          path: ./output/Aida64-Keys.dmg
+         name: Aida64Keys.dmg
+         path: ./output/Aida64-Keys.dmg
+         
+         
+         
