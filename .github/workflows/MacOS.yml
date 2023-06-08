@@ -27,23 +27,26 @@ jobs:
         run: cargo build --verbose
       - name: Add x86_64-apple-darwin
         run: rustup target add x86_64-apple-darwin
-      - name: Make
+      - name: Make cargo
         run: cargo build --target x86_64-apple-darwin
      # - name: Upload 
       #  uses: actions/upload-artifact@master
        # with:
         #  name: For_Macos
          # path: ./
-      - name: Create output directory
-        run: mkdir -p ${{ github.workspace }}/output
+      - name: Create Output Directory
+        run: mkdir -p $GITHUB_WORKSPACE/output
+
       - name: Upload test
         uses: actions/upload-artifact@master
         with:
           name: For_Macos
           path: ./
+      
       - name: Create DMG
-        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "/.github/workflows/icon.icns"
-
+        run: create-dmg $GITHUB_WORKSPACE/target/x86_64-apple-darwin/debug/aida64-keys-gui $GITHUB_WORKSPACE/output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "$GITHUB_WORKSPACE/.github/workflows/icon.icns"
+      
+      
       - name: Upload DMG
         uses: actions/upload-artifact@master
         with:
