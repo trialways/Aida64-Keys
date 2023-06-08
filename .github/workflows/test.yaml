@@ -1,0 +1,37 @@
+name: Build and Deploy DMG
+
+on:
+  
+    workflow_dispatch
+      # 修改为您所需的分支
+    
+jobs:
+  build:
+    runs-on: macos-latest
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+
+      - name: Set up Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+
+      - name: Install create-dmg
+        run: brew install create-dmg -g
+
+      - name: Create Output Directory
+        run: mkdir -p output
+
+      - name: Build
+        run: cargo build --release
+
+      - name: Create DMG
+        run: create-dmg target/release/aida64-keys-gui output/Aida64-Keys.dmg --volname "Aida64 Keys" --icon .github/workflows/icon.icns
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v2
+        with:
+          name: Aida64-Keys
+          path: output/Aida64-Keys.dmg
