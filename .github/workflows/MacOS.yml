@@ -38,6 +38,17 @@ jobs:
         run: brew install create-dmg -g 
       - name: Set permissions folder
         run: chmod -R 777 ./target
+        
+      - name: Check Target Folder
+        run: |
+         ls -al ./target/x86_64-apple-darwin/
+         echo "Target Folder Exists"
+
+      - name: Check Output File
+        run: |
+         ls -al ./target/x86_64-apple-darwin/64key.dmg
+         echo "Output File Exists"
+        
       - name: Create DMG
         run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./target/x86_64-apple-darwin/debug/64key.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
         #working-directory: ${{ github.workspace }}
