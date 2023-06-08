@@ -18,11 +18,7 @@ jobs:
 
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
- #  
-
-      - name: Install create-dmg
-        run: brew install -g create-dmg
-
+  
       - name: Build
         run: cargo build --verbose
       - name: Add x86_64-apple-darwin
@@ -37,19 +33,16 @@ jobs:
    #   - name: Create Output Directory
     #    run: mkdir -p ${{ github.workspace }}/output
      #   working-directory: ${{ github.workspace }}
-        
-      - name: Upload test
-        uses: actions/upload-artifact@master
-        with:
-          name: For_Macos
-          path: ${{ github.workspace }}
+      
+      - name: Install create-dmg
+        run: brew install create-dmg -g 
       
       - name: Create DMG
-        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./target/x86_64-apple-darwin/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
+        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./target/x86_64-apple-darwin/Aida64Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
         #working-directory: ${{ github.workspace }}
       
       - name: Upload DMG
         uses: actions/upload-artifact@master
         with:
-          name: Aida64-Keys.dmg
+          name: Aida64Keys.dmg
           path: ./output/Aida64-Keys.dmg
