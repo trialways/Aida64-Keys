@@ -36,9 +36,10 @@ jobs:
       
       - name: Install create-dmg
         run: brew install create-dmg -g 
-      
+      - name: Set permissions for ./target
+        run: chmod -R 777 ./target
       - name: Create DMG
-        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./target/x86_64-apple-darwin/Aida64Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
+        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./target/x86_64-apple-darwin/64key.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
         #working-directory: ${{ github.workspace }}
       
       - name: Upload DMG
