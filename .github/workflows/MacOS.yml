@@ -46,7 +46,7 @@ jobs:
         
       - name: Create DMG
         run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ github.workspace }}/Aida64-Keys.dmg" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
-        working-directory: ${{ github.workspace }}/target/x86_64-apple-darwin/debug
+        working-directory: ${{ github.workspace }}
       
       - name: Check Output File
         run: |
