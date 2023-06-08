@@ -17,10 +17,7 @@ jobs:
         uses: actions/checkout@main
 
       - name: Set up Rust
-        uses: actions-rs/toolchain@v1
-        with:
-           toolchain: nightly-86_64-apple-darwin
-           override: true
+        uses: dtolnay/rust-toolchain@stable
  #  
 
       - name: Install create-dmg
