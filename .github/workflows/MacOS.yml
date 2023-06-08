@@ -35,7 +35,7 @@ jobs:
         #  name: For_Macos
          # path: ./
       - name: Create output directory
-        run: mkdir -p ./output
+        run: mkdir -p ${{ github.workspace }}/output
       - name: Upload test
         uses: actions/upload-artifact@master
         with:
