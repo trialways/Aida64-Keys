@@ -45,9 +45,9 @@ jobs:
          echo "Target Folder Exists"
         
       - name: Create DMG
-        run: create-dmg ./target/x86_64-apple-darwin/debug/aida64-keys-gui ./target/Aida64-Keys.dmg --volname "Aida64 Keys" --icon "./.github/workflows/icon.icns"
-        #working-directory: ${{ github.workspace }}
-        working-directory: ${{ github.workspace }}
+        run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ github.workspace }}/target/Aida64-Keys.dmg" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
+        working-directory: ${{ github.workspace }}space }}
+      
       - name: Check Output File
         run: |
          ls -al ./target/Aida64-Keys.dmg
