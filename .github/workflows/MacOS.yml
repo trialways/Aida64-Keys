@@ -16,17 +16,19 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@main
 
-     # - name: Set up Rust
-     #   uses: dtolnay/rust-toolchain@stable
+      - name: Set up Rust
+        uses: dtolnay/rust-toolchain@stable
+        with: 
+          toolchain: stable latest
     #node12error  - name: Setup Rust
      #node12error   uses: actions-rs/toolchain@v1
       #node12error    with:
        #node12error    toolchain: stable
       #node12error     node-version: 16
-      - name: Setup Rust
-        uses: ATiltedTree/setup-rust@v1
-        with:
-          rust-version: stable
+      #node12error- name: Setup Rust
+       #node12error uses: ATiltedTree/setup-rust@v1
+        #node12errorwith:
+        #node12error rust-version: stable
       - name: Install dependencies
         run: brew install cmake 
       
