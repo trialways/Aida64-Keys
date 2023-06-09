@@ -18,15 +18,20 @@ jobs:
 
      # - name: Set up Rust
      #   uses: dtolnay/rust-toolchain@stable
+    #node12error  - name: Setup Rust
+     #node12error   uses: actions-rs/toolchain@v1
+      #node12error    with:
+       #node12error    toolchain: stable
+      #node12error     node-version: 16
       - name: Setup Rust
-        uses: actions-rs/toolchain@v1
+        uses: ATiltedTree/setup-rust@v1
         with:
-         toolchain: stable
-         node-version: 16
-#  - name: Setup | Rust
-  #      uses: ATiltedTree/setup-rust@v1
-   #     with:
-     #     rust-version: stable
+          rust-version: stable
+  
+      - name: Install Xcode
+        uses: actions/setup-xcode@v2
+        with:
+          xcode-version: 'latest'
   
       - name: Build
         run: cargo build --verbose
@@ -34,11 +39,11 @@ jobs:
         run: rustup target add x86_64-apple-darwin
       - name: Make cargo
         run: cargo build --target x86_64-apple-darwin
-     # - name: Upload 
-      #  uses: actions/upload-artifact@master
-       # with:
-        #  name: For_Macos
-         # path: ./
+      - name: Upload 
+        uses: actions/upload-artifact@master
+        with:
+           name: x86_64-apple-darwin
+           path: ./target/x86_64-apple-darwin
    #   - name: Create Output Directory
     #    run: mkdir -p ${{ github.workspace }}/output
      #   working-directory: ${{ github.workspace }}
