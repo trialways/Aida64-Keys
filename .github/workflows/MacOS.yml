@@ -27,11 +27,9 @@ jobs:
         uses: ATiltedTree/setup-rust@v1
         with:
           rust-version: stable
-  
-      - name: Install Xcode
-        uses: actions/setup-xcode@v2
-        with:
-          xcode-version: 'latest'
+      - name: Install dependencies
+        run: brew install cmake 
+      
   
       - name: Build
         run: cargo build --verbose
