@@ -16,8 +16,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@main
 
-      - name: Set up Rust
-        uses: dtolnay/rust-toolchain@stable
+     # - name: Set up Rust
+     #   uses: dtolnay/rust-toolchain@stable
+      - name: Setup Rust
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable 
+#  - name: Setup | Rust
+  #      uses: ATiltedTree/setup-rust@v1
+   #     with:
+     #     rust-version: stable
   
       - name: Build
         run: cargo build --verbose
@@ -33,29 +41,31 @@ jobs:
    #   - name: Create Output Directory
     #    run: mkdir -p ${{ github.workspace }}/output
      #   working-directory: ${{ github.workspace }}
-      - name: Install create-dmg
-        run: npm install -g create-dmg@latest
-      - name: Create Output Directory
-        run: mkdir -p ${{ github.workspace }}/output
-        working-directory: ${{ github.workspace }}
+    
+    ##################################
+    #【- name: Install create-dmg
+     #   run: npm install -g create-dmg@latest
+    #  - name: Create Output Directory
+     #   run: mkdir -p ${{ github.workspace }}/output
+      #  working-directory: ${{ github.workspace }}
 
-      - name: Set Output Path
-        run: echo "OUTPUT_PATH=${{ github.workspace }}/output/Aida64-Keys.dmg" >> $GITHUB_ENV
-        working-directory: ${{ github.workspace }}
+     # - name: Set Output Path
+      #  run: echo "OUTPUT_PATH=${{ github.workspace }}/output/Aida64-Keys.dmg" >> $GITHUB_ENV
+      #  working-directory: ${{ github.workspace }}
 
-      - name: Create DMG
-        run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ env.OUTPUT_PATH }}" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
-        working-directory: ${{ github.workspace }}
+     # - name: Create DMG
+      #  run: create-dmg "${{ github.workspace }}/target/x86_64-apple-darwin/debug/aida64-keys-gui" "${{ env.OUTPUT_PATH }}" --volname "Aida64 Keys" --icon "${{ github.workspace }}/.github/workflows/icon.icns"
+      #  working-directory: ${{ github.workspace }}
 
-      - name: Check Output File
-        run: |
-         ls -al "${{ env.OUTPUT_PATH }}"
-         echo "Output File Exists"
+     # - name: Check Output File
+     #   run: |
+       #  ls -al "${{ env.OUTPUT_PATH }}"
+        # echo "Output File Exists"
 
-      - name: Upload DMG
-        uses: actions/upload-artifact@master
-        with:
-          name: Aida64Keys.dmg
-          path: ${{ env.OUTPUT_PATH }}
+    #  - name: Upload DMG
+      #  uses: actions/upload-artifact@master
+     #   with:
+        #  name: Aida64Keys.dmg
+       #   path: ${{ env.OUTPUT_PATH }}  】
          
          
