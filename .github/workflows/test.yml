@@ -1,4 +1,4 @@
-name: Build and Deploy DMG
+name: Test B&D DMG
 
 on:
   workflow_dispatch:
