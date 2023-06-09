@@ -19,7 +19,7 @@ jobs:
       - name: Set up Rust
         uses: dtolnay/rust-toolchain@stable
         with: 
-          toolchain: 1.62.0
+          toolchain: nightly
     #node12error  - name: Setup Rust
      #node12error   uses: actions-rs/toolchain@v1
       #node12error    with:
