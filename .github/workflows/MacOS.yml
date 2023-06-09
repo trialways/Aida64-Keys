@@ -21,7 +21,8 @@ jobs:
       - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
-          toolchain: stable 
+         toolchain: stable
+         node-version: 16
 #  - name: Setup | Rust
   #      uses: ATiltedTree/setup-rust@v1
    #     with:
